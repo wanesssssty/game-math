@@ -1,64 +1,121 @@
-import { getHealth } from "@/lib/api/health";
-import { ApiError } from "@/lib/api/client";
+import Link from "next/link";
+import { SiteFrame } from "@/components/site-frame";
+import { buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-export default async function Home() {
-  let serverStatus = "unreachable";
-  let serverMessage = "Server is not connected";
+const cards = [
+  {
+    href: "/addition",
+    title: "Додавання",
+    text: "Збирай числа разом і тренуй швидке мислення.",
+    bg: "radial-gradient(circle at 20% 20%,#fff5,transparent 28%), linear-gradient(135deg,#0ea5e9,#38bdf8)",
+    icon: "➕",
+  },
+  {
+    href: "/subtraction",
+    title: "Віднімання",
+    text: "Віднімай точно та знаходь правильний результат.",
+    bg: "radial-gradient(circle at 20% 20%,#fff5,transparent 28%), linear-gradient(135deg,#ec4899,#f472b6)",
+    icon: "➖",
+  },
+  {
+    href: "/multiplication",
+    title: "Множення",
+    text: "Таблиця множення у форматі міні-гри.",
+    bg: "radial-gradient(circle at 20% 20%,#fff5,transparent 28%), linear-gradient(135deg,#10b981,#34d399)",
+    icon: "✖️",
+  },
+  {
+    href: "/division",
+    title: "Ділення",
+    text: "Вчись ділити приклади без залишку.",
+    bg: "radial-gradient(circle at 20% 20%,#fff5,transparent 28%), linear-gradient(135deg,#8b5cf6,#a78bfa)",
+    icon: "➗",
+  },
+];
 
-  try {
-    const health = await getHealth();
-    serverStatus = health.status;
-    serverMessage = `${health.service} at ${new Date(
-      health.timestamp
-    ).toLocaleString()}`;
-  } catch (error) {
-    if (error instanceof ApiError) {
-      serverMessage = `${error.message} (HTTP ${error.statusCode})`;
-    } else {
-      serverMessage = "Unexpected error while connecting to API";
-    }
-  }
-
+export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-8 font-sans dark:bg-black">
-      <main className="w-full max-w-3xl rounded-2xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-950">
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Game Math starter architecture
-        </h1>
+    <SiteFrame>
+      <section className="relative overflow-hidden rounded-3xl border border-indigo-300/30 bg-gradient-to-br from-indigo-950 via-blue-950 to-fuchsia-950 p-6 shadow-2xl shadow-black/40 md:p-10">
+        <div className="absolute -right-14 -top-16 h-56 w-56 rounded-full bg-cyan-300/20 blur-2xl" />
+        <div className="absolute -bottom-16 left-1/4 h-44 w-44 rounded-full bg-pink-300/20 blur-2xl" />
 
-        <p className="mt-3 text-zinc-600 dark:text-zinc-400">
-          Client-server foundation is ready. You can start implementing features.
-        </p>
-
-        <section className="mt-8 space-y-3">
-          <h2 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
-            API connectivity
-          </h2>
-          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Status:{" "}
-              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                {serverStatus}
-              </span>
+        <div className="relative grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+          <div>
+            <div className="mb-4 flex flex-wrap gap-2">
+              <Badge variant="secondary">Навчання через гру</Badge>
+              <Badge variant="secondary">Для дітей 6+</Badge>
+              <Badge variant="secondary">Українською</Badge>
+            </div>
+            <h1 className="max-w-[18ch] text-3xl leading-tight font-black md:text-5xl">
+              Math Paws — математика, яку хочеться проходити
+            </h1>
+            <p className="mt-3 max-w-[58ch] text-indigo-100/90 md:text-lg">
+              Веселий тренажер з додавання, віднімання, множення і ділення. Формат
+              коротких місій, зрозумілий інтерфейс та миттєвий фідбек на кожну відповідь.
             </p>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              {serverMessage}
-            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link
+                className={cn(
+                  buttonVariants(),
+                  "h-10 rounded-xl bg-gradient-to-r from-cyan-300 via-sky-300 to-pink-300 px-4 font-extrabold text-slate-900 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-400/30"
+                )}
+                href="/test"
+              >
+                Почати тест
+              </Link>
+              <Link
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "h-10 rounded-xl border border-indigo-200/40 px-4 font-bold text-slate-100 transition hover:border-cyan-200 hover:bg-cyan-300/10"
+                )}
+                href="/addition"
+              >
+                Обрати тему
+              </Link>
+            </div>
           </div>
-        </section>
+          <div
+            className="grid min-h-56 place-items-center rounded-2xl border border-indigo-200/30 bg-gradient-to-br from-indigo-900/70 to-blue-900/70 text-5xl shadow-lg"
+            aria-hidden
+          >
+            🐱✨🔢
+          </div>
+        </div>
+      </section>
 
-        <section className="mt-8">
-          <h2 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
-            Next development steps
-          </h2>
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-zinc-600 dark:text-zinc-400">
-            <li>Add domain modules in `server/src/routes` and `server/src/controllers`.</li>
-            <li>Create shared DTOs/contracts for API payloads.</li>
-            <li>Add auth and database layer.</li>
-            <li>Cover core flows with integration tests.</li>
-          </ul>
-        </section>
-      </main>
-    </div>
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {cards.map((card) => (
+          <Card className="rounded-2xl border-indigo-300/20 bg-slate-900/90 shadow-xl shadow-black/20" key={card.href}>
+            <CardHeader>
+              <CardTitle className="text-xl font-black">{card.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+            <div
+              className="mb-3 grid h-34 place-items-center rounded-xl text-3xl"
+              style={{ backgroundImage: card.bg }}
+            >
+              {card.icon}
+            </div>
+            <p className="mt-2 text-sm text-indigo-100/85">{card.text}</p>
+            </CardContent>
+            <CardFooter>
+            <Link
+              className={cn(
+                buttonVariants(),
+                "mt-1 h-10 rounded-xl bg-gradient-to-r from-cyan-300 via-sky-300 to-pink-300 px-4 font-extrabold text-slate-900 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-400/30"
+              )}
+              href={card.href}
+            >
+              Грати
+            </Link>
+            </CardFooter>
+          </Card>
+        ))}
+      </section>
+    </SiteFrame>
   );
 }

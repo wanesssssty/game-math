@@ -1,20 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Nunito, Geist } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
-const geistMono = Geist_Mono({
+const nunito = Nunito({
+  subsets: ["latin", "cyrillic"],
   variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Game Math",
-  description: "Client for the Game Math platform",
+  title: "Math Paws",
+  description: "Інтерактивне вивчення математики для дітей",
 };
 
 export default function RootLayout({
@@ -23,12 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="uk" className={cn("dark font-sans", geist.variable)}>
+      <body className={`${nunito.variable} antialiased`}>{children}</body>
     </html>
   );
 }
