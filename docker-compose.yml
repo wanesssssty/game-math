@@ -1,13 +1,29 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: game-math-postgres-dev
+    environment:
+      POSTGRES_DB: game_math
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   server:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
     container_name: game-math-server-dev
+    depends_on:
+      - postgres
     environment:
       NODE_ENV: development
       PORT: 4000
       CORS_ORIGIN: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/game_math?schema=public
+      JWT_SECRET: dev-docker-jwt-secret-change-me-in-real-deploy
     ports:
       - "4000:4000"
     volumes:
@@ -31,4 +47,7 @@ services:
       - ./client:/app
       - /app/node_modules
       - /app/.next
+
+volumes:
+  postgres_data:
 

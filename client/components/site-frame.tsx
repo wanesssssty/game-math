@@ -11,6 +11,8 @@ const navItems = [
   { href: "/multiplication", label: "Множення" },
   { href: "/division", label: "Ділення" },
   { href: "/test", label: "Тест" },
+  { href: "/shop", label: "Магазин" },
+  { href: "/inventory", label: "Інвентар" },
   { href: "/login", label: "Авторизація" },
 ];
 

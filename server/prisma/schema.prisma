@@ -1,0 +1,139 @@
+// Game Math — повна схема БД (коти, кастомізація, прогрес, сесії, журнал помилок)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Rarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+enum OperationType {
+  ADD
+  SUB
+  MUL
+  DIV
+}
+
+enum CustomizationType {
+  FUR
+  EYES
+  ACCESSORY
+  BACKGROUND
+}
+
+model User {
+  id               String   @id @default(uuid()) @db.Uuid
+  email            String   @unique
+  password         String?
+  name             String?
+  candyBalance     Int      @default(0)
+  selectedCatId    String?  @db.Uuid
+  selectedCat      Cat?     @relation("UserSelectedCat", fields: [selectedCatId], references: [id], onDelete: SetNull)
+  createdAt        DateTime @default(now())
+
+  userCats               UserCat[]
+  userCustomizations     UserCustomization[]
+  userCatCustomizations  UserCatCustomization[]
+  progress               Progress[]
+  gameSessions           GameSession[]
+  errorLogs              ErrorLog[]
+}
+
+model Cat {
+  id       String   @id @default(uuid()) @db.Uuid
+  name     String
+  rarity   Rarity
+  imageUrl String
+
+  selectedByUsers User[]    @relation("UserSelectedCat")
+  userCats        UserCat[]
+}
+
+model UserCat {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  catId      String   @db.Uuid
+  cat        Cat      @relation(fields: [catId], references: [id], onDelete: Cascade)
+  unlockedAt DateTime @default(now())
+
+  @@unique([userId, catId])
+}
+
+model CustomizationOption {
+  id       String            @id @default(uuid()) @db.Uuid
+  name     String
+  type     CustomizationType
+  imageUrl String
+  price    Int
+  rarity   Rarity
+
+  userCustomizations    UserCustomization[]
+  userCatCustomizations UserCatCustomization[]
+}
+
+model UserCustomization {
+  id                String              @id @default(uuid()) @db.Uuid
+  userId            String              @db.Uuid
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customizationId   String              @db.Uuid
+  customization     CustomizationOption @relation(fields: [customizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, customizationId])
+}
+
+model UserCatCustomization {
+  id                String              @id @default(uuid()) @db.Uuid
+  userId            String              @db.Uuid
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customizationId   String              @db.Uuid
+  customization     CustomizationOption @relation(fields: [customizationId], references: [id], onDelete: Cascade)
+  type              CustomizationType
+
+  @@unique([userId, type])
+}
+
+model Progress {
+  id             String          @id @default(uuid()) @db.Uuid
+  userId         String          @db.Uuid
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  operationType  OperationType
+  level          Int
+  highScore      Int             @default(0)
+  bestStreak     Int             @default(0)
+
+  @@unique([userId, operationType, level])
+}
+
+model GameSession {
+  id             String          @id @default(uuid()) @db.Uuid
+  userId         String          @db.Uuid
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  operationType  OperationType
+  level          Int
+  score          Int
+  correctAnswers Int
+  wrongAnswers   Int
+  createdAt      DateTime        @default(now())
+}
+
+model ErrorLog {
+  id             String          @id @default(uuid()) @db.Uuid
+  userId         String          @db.Uuid
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  operationType  OperationType
+  number1        Int
+  number2        Int
+  correctAnswer  Int
+  userAnswer     Int
+  attempts       Int
+  createdAt      DateTime        @default(now())
+}
