@@ -1,13 +1,14 @@
 #!/bin/sh
 set -eu
 
-if [ ! -f node_modules/prisma/package.json ]; then
+if [ ! -f node_modules/.package-lock.hash ] || ! cmp -s package-lock.json node_modules/.package-lock.hash; then
   echo "Installing server dependencies..."
   npm install
+  cp package-lock.json node_modules/.package-lock.hash
 fi
 
 echo "Waiting for PostgreSQL..."
-until npx prisma migrate status >/dev/null 2>&1; do
+until node -e "const { Client } = require('pg'); const client = new Client({ connectionString: process.env.DATABASE_URL }); client.connect().then(() => client.end()).then(() => process.exit(0)).catch(() => process.exit(1));" >/dev/null 2>&1; do
   sleep 2
 done
 

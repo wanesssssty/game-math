@@ -8,6 +8,7 @@ const { getShop, buy } = require("../controllers/shop.controller");
 const { getInventory } = require("../controllers/inventory.controller");
 const { updateAvatar } = require("../controllers/avatar.controller");
 const { listErrors } = require("../controllers/errors-list.controller");
+const { getAccount } = require("../controllers/account.controller");
 
 const apiRouter = Router();
 
@@ -26,6 +27,7 @@ apiRouter.get("/problem", getProblem);
 apiRouter.post("/problem/answer", postAnswer);
 apiRouter.get("/hint", getHint);
 
+apiRouter.get("/account", getAccount);
 apiRouter.post("/shop/buy", buy);
 apiRouter.get("/inventory", getInventory);
 apiRouter.post("/avatar/update", updateAvatar);

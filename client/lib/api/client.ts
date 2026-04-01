@@ -1,4 +1,5 @@
 import { config } from "@/lib/config";
+import { getAuthToken } from "@/lib/auth";
 import type { ApiResponse } from "./types";
 
 export class ApiError extends Error {
@@ -17,10 +18,12 @@ export async function apiRequest<T>(
   path: string,
   init?: RequestInit
 ): Promise<T> {
+  const token = getAuthToken();
   const response = await fetch(`${config.apiBaseUrl}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers || {}),
     },
     cache: "no-store",

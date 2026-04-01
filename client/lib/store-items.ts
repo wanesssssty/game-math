@@ -1,38 +1,54 @@
-export type StoreItem = {
-  id: string;
-  title: string;
-  price: number;
-  emoji: string;
-  description: string;
+import type { CustomizationOption, CustomizationType, Rarity } from "@/lib/account-api";
+
+const typeMeta: Record<
+  CustomizationType,
+  { emoji: string; label: string; description: string }
+> = {
+  FUR: {
+    emoji: "🧶",
+    label: "Шерсть",
+    description: "Змінює стиль шерсті твого котика.",
+  },
+  EYES: {
+    emoji: "✨",
+    label: "Очі",
+    description: "Додає виразності погляду аватара.",
+  },
+  ACCESSORY: {
+    emoji: "🎀",
+    label: "Аксесуар",
+    description: "Прикраса для образу маленького математика.",
+  },
+  BACKGROUND: {
+    emoji: "🌌",
+    label: "Фон",
+    description: "Нове тло для профілю та аватара.",
+  },
 };
 
-export const storeItems: StoreItem[] = [
-  {
-    id: "hat",
-    title: "Капелюх мудреця",
-    price: 20,
-    emoji: "🎩",
-    description: "Додає стилю під час розв'язання прикладів.",
+const rarityMeta: Record<Rarity, { label: string; className: string }> = {
+  COMMON: {
+    label: "Звичайний",
+    className: "border-slate-600/70 bg-slate-800/80 text-slate-200",
   },
-  {
-    id: "wand",
-    title: "Чарівна паличка",
-    price: 35,
-    emoji: "🪄",
-    description: "Для справжніх математичних магів.",
+  RARE: {
+    label: "Рідкісний",
+    className: "border-sky-400/40 bg-sky-500/10 text-sky-200",
   },
-  {
-    id: "medal",
-    title: "Медаль чемпіона",
-    price: 50,
-    emoji: "🏅",
-    description: "Пам'ятка про твої досягнення.",
+  EPIC: {
+    label: "Епічний",
+    className: "border-fuchsia-400/40 bg-fuchsia-500/10 text-fuchsia-200",
   },
-  {
-    id: "pet",
-    title: "Міні-котик",
-    price: 75,
-    emoji: "🐾",
-    description: "Вірний помічник у навчанні.",
+  LEGENDARY: {
+    label: "Легендарний",
+    className: "border-amber-400/40 bg-amber-500/10 text-amber-200",
   },
-];
+};
+
+export function getCustomizationUi(option: CustomizationOption) {
+  return typeMeta[option.type];
+}
+
+export function getRarityUi(rarity: Rarity) {
+  return rarityMeta[rarity];
+}

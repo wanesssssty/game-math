@@ -11,10 +11,22 @@ export type ChildProgressSession = {
 
 const LOCAL_KEY = "math-paws-progress-sessions";
 
+export function getLocalProgressSessions() {
+  if (typeof window === "undefined") return [] as ChildProgressSession[];
+
+  const raw = window.localStorage.getItem(LOCAL_KEY);
+
+  try {
+    return raw ? (JSON.parse(raw) as ChildProgressSession[]) : [];
+  } catch {
+    window.localStorage.removeItem(LOCAL_KEY);
+    return [] as ChildProgressSession[];
+  }
+}
+
 function saveToLocalStorage(session: ChildProgressSession) {
   if (typeof window === "undefined") return;
-  const raw = window.localStorage.getItem(LOCAL_KEY);
-  const list = raw ? (JSON.parse(raw) as ChildProgressSession[]) : [];
+  const list = getLocalProgressSessions();
   list.unshift(session);
   window.localStorage.setItem(LOCAL_KEY, JSON.stringify(list.slice(0, 100)));
 }
@@ -26,7 +38,7 @@ export async function saveChildProgress(session: ChildProgressSession) {
       body: JSON.stringify(session),
     });
   } catch {
-    // Fallback for now: until dedicated backend endpoint exists.
+    // Keep a browser-local history if the progress API is unavailable.
     saveToLocalStorage(session);
   }
 }

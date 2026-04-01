@@ -1,41 +1,117 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { AuthRequired } from "@/components/auth-required";
 import { SiteFrame } from "@/components/site-frame";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { storeItems } from "@/lib/store-items";
+import { fetchInventory, type InventoryItem } from "@/lib/account-api";
+import { ApiError } from "@/lib/api/client";
+import { getCustomizationUi, getRarityUi } from "@/lib/store-items";
+import { useAuth } from "@/lib/use-auth";
 
 export default function InventoryPage() {
-  const [owned] = useState<string[]>(["hat", "medal"]);
+  const { isAuthenticated } = useAuth();
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
-  const visibleItems = useMemo(
-    () => storeItems.filter((item) => owned.includes(item.id)),
-    [owned]
-  );
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setItems([]);
+      setIsLoading(false);
+      return;
+    }
+
+    let active = true;
+
+    const loadInventory = async () => {
+      setIsLoading(true);
+      setMessage("");
+
+      try {
+        const data = await fetchInventory();
+
+        if (!active) return;
+
+        setItems(data.items);
+      } catch (error) {
+        if (!active) return;
+        setMessage(
+          error instanceof ApiError ? error.message : "Не вдалося завантажити інвентар."
+        );
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadInventory();
+
+    return () => {
+      active = false;
+    };
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return (
+      <SiteFrame>
+        <AuthRequired
+          title="Інвентар"
+          description="Інвентар відкривається після входу в акаунт і показує всі предмети, куплені за цукерки."
+        />
+      </SiteFrame>
+    );
+  }
 
   return (
     <SiteFrame>
       <section className="mb-4 rounded-2xl bg-slate-900/90 p-6 shadow">
         <h1 className="text-3xl font-black">Інвентар</h1>
         <p className="mt-2 text-sm text-slate-300">
-          Тут зберігаються предмети, які ти вже придбав.
+          Тут зберігаються всі предмети, які вже придбані для твого профілю.
         </p>
+        {message ? <p className="mt-3 text-sm font-semibold text-cyan-100">{message}</p> : null}
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {visibleItems.map((item) => (
-          <Card key={item.id} className="bg-slate-900/90">
-            <CardHeader>
-              <CardTitle>{item.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-3 grid h-24 place-items-center rounded-xl bg-slate-800 text-4xl">
-                {item.emoji}
-              </div>
-              <p className="text-sm text-slate-300">{item.description}</p>
-            </CardContent>
-          </Card>
-        ))}
+        {isLoading ? (
+          <div className="rounded-2xl bg-slate-900/90 p-6 text-sm text-slate-300">
+            Завантажуємо інвентар...
+          </div>
+        ) : null}
+        {!isLoading && items.length === 0 ? (
+          <div className="rounded-2xl bg-slate-900/90 p-6 text-sm text-slate-300">
+            Поки що жодного предмета не куплено.
+          </div>
+        ) : null}
+        {items.map((item) => {
+          const typeUi = getCustomizationUi(item.option);
+          const rarityUi = getRarityUi(item.option.rarity);
+
+          return (
+            <Card key={item.id} className="bg-slate-900/90">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-3">
+                  <CardTitle>{item.option.name}</CardTitle>
+                  <Badge variant="secondary">{typeUi.label}</Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-3 grid h-24 place-items-center rounded-xl bg-slate-800 text-4xl">
+                  {typeUi.emoji}
+                </div>
+                <p className="text-sm text-slate-300">{typeUi.description}</p>
+                <span
+                  className={`mt-3 inline-flex rounded-full border px-2 py-1 text-xs font-bold ${rarityUi.className}`}
+                >
+                  {rarityUi.label}
+                </span>
+              </CardContent>
+            </Card>
+          );
+        })}
       </section>
     </SiteFrame>
   );

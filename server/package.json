@@ -4,7 +4,7 @@
   "description": "Game Math API server",
   "main": "src/server.js",
   "scripts": {
-    "dev": "node --watch src/server.js",
+    "dev": "nodemon -L --watch src --watch prisma --ext js,json,prisma src/server.js",
     "start": "node src/server.js",
     "test": "echo \"No tests configured yet\"",
     "prisma:migrate": "prisma migrate dev",
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "@types/jsonwebtoken": "^9.0.10"
+    "@types/jsonwebtoken": "^9.0.10",
+    "nodemon": "^3.1.14"
   }
 }

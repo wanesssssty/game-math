@@ -161,6 +161,7 @@ Authorization: Bearer <token>
 
 | Метод | Шлях | Опис |
 |--------|------|------|
+| `GET` | `/api/account` | Дані акаунту: баланс, котик, інвентар, прогрес, останні помилки |
 | `GET` | `/api/problem` | Нова задача |
 | `POST` | `/api/problem/answer` | Перевірка відповіді |
 | `GET` | `/api/hint` | Текст підказки для поточного `problemToken` |
@@ -168,6 +169,18 @@ Authorization: Bearer <token>
 | `GET` | `/api/inventory` | Куплені предмети |
 | `POST` | `/api/avatar/update` | Обраний кіт і/або екіпіровка |
 | `GET` | `/api/errors` | Журнал помилкових відповідей |
+
+**`GET /api/account`**
+
+Повертає зведені дані для дашборду користувача:
+
+- `data.user` — базова інформація користувача (`id`, `email`, `name`, `candyBalance`);
+- `data.selectedCat` — активний кіт або `null`;
+- `data.unlockedCats[]` — усі відкриті котики;
+- `data.inventory[]` — куплені предмети з вкладеним `option`;
+- `data.equipped[]` — активні кастомізації;
+- `data.progress[]` — записи `Progress` для різних операцій і рівнів;
+- `data.recentErrors[]` — останні помилки з `ErrorLog`.
 
 **`GET /api/problem`**
 

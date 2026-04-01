@@ -36,11 +36,12 @@
 
 ### Клієнт (`client`)
 
-- **Сторінки:** головна (`/`), режими `/addition`, `/subtraction`, `/multiplication`, `/division`, змішаний тест `/test`, логін `/login`, магазин `/shop`, інвентар `/inventory`.
+- **Сторінки:** головна (`/`), режими `/addition`, `/subtraction`, `/multiplication`, `/division`, змішаний тест `/test`, логін `/login`, акаунт `/account`, магазин `/shop`, інвентар `/inventory`.
 - **UI:** Tailwind utility-класи, компоненти **shadcn/ui** (`Button`, `Card`, `Input`, `Badge`, `Dialog`, `Progress`, `Tabs` тощо).
-- **Ігри:** калькулятор для відповіді, прогрес по 10 питань у режимах операцій, діалоги результатів, журнал помилок у тесті.
+- **Ігри:** API-флоу через `GET /api/problem`, `POST /api/problem/answer`, `GET /api/hint`, прогрес по 10 питаннях, рівні 1..10, підсумок сесії, журнал помилок у змішаному тесті.
 - **API-шар:** `lib/api` — уніфіковані запити; `lib/config.ts` — базовий URL бекенду.
-- **Прогрес:** після сесії відправка на `POST /api/progress` (fallback у `localStorage`, якщо API недоступний) — `lib/progress-storage.ts`.
+- **Акаунт:** сторінка `/account` показує баланс, прогрес за операціями, інвентар, активного кота й останні помилки.
+- **Прогрес:** `POST /api/progress` з fallback у `localStorage` збережено для guest-історії браузера — `lib/progress-storage.ts`.
 
 Детальніше: [`client/README.md`](./client/README.md).
 
@@ -48,7 +49,7 @@
 
 - Express: CORS, JSON, роути під `/api`, обробка 404 та помилок.
 - **Prisma** + PostgreSQL: повна ігрова схема (користувачі, коти, кастомізація, прогрес, сесії, журнал помилок).
-- Ендпоінти прогресу сумісні з поточним клієнтом (guest-користувач за ім’ям дитини); окремо — **реєстрація/логін**, задачі, магазин, інвентар, аватар, `GET /api/errors` (див. `server/README.md`).
+- Ендпоінти прогресу сумісні з клієнтом (guest-користувач за ім’ям дитини); окремо — **реєстрація/логін**, задачі, акаунт, магазин, інвентар, аватар, `GET /api/errors` (див. `server/README.md`).
 
 Детальніше: [`server/README.md`](./server/README.md).
 
@@ -213,6 +214,7 @@ docker compose down -v
 | `GET` | `/` | Статус API |
 | `GET` | `/api/health` | Health check |
 | `POST` | `/api/register`, `POST /api/login` | Реєстрація та логін (JWT) |
+| `GET` | `/api/account` | Дані акаунту: баланс, прогрес, інвентар, котик, останні помилки |
 | `GET` | `/api/shop`, `POST /api/shop/buy` | Магазин; покупка з JWT |
 | `GET` | `/api/problem`, `POST /api/problem/answer`, `GET /api/hint` | Задачі з токеном `problemToken` (JWT) |
 | `GET` | `/api/inventory`, `POST /api/avatar/update`, `GET /api/errors` | Інвентар, аватар, журнал помилок (JWT) |
@@ -283,12 +285,12 @@ game-math/
 
 ## Що можна зробити далі
 
-1. Реєстрація / логін з хешуванням пароля та JWT або сесіями.
-2. Прив’язати `childName` до справжнього `userId` замість guest-email.
-3. REST для котів, магазину, кастомізації та запису **ErrorLog** з клієнта.
-4. Seed-скрипт для `Cat` та `CustomizationOption`.
-5. Тести (Vitest/Jest + Supertest для API).
-6. CI: lint, build, `prisma migrate deploy` на staging.
+1. Додати UI для вибору активного котика та екіпіровки через `POST /api/avatar/update`.
+2. Зробити окремий режим «робота над помилками» на основі `GET /api/errors`.
+3. Прив’язати guest-прогрес до справжнього `userId`, щоб історія гостьових сесій краще поєднувалась з акаунтом.
+4. Додати тести (Vitest/Jest + Supertest для API).
+5. Підняти CI: lint, build, `prisma migrate deploy` на staging.
+6. За потреби об’єднати `documetation.md` і кореневий README, щоб не дублювати зміст.
 
 ---
 
