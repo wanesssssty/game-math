@@ -19,7 +19,7 @@ cp .env.example .env
 
 ```bash
 npx prisma migrate deploy
-npx prisma db seed    # коти (якщо немає за іменем) + товари магазину (якщо таблиця порожня)
+node prisma/seed.js   # коти (якщо немає за іменем) + товари магазину (якщо таблиця порожня)
 npm run dev
 ```
 
@@ -38,8 +38,7 @@ docker compose up --build
 - API: **http://localhost:4000**
 - Клієнт очікує `NEXT_PUBLIC_API_BASE_URL=http://localhost:4000` (у compose вже так).
 - Postgres усередині мережі compose: хост `postgres`, порт **5432**; з машини хоста — зазвичай **localhost:5433**.
-
-Після першого підняття БД у контейнері за потреби виконай міграції та сід **усередині** контейнера сервера або локально, вказавши `DATABASE_URL` на ту саму БД.
+- У dev-контейнері сервера міграції Prisma і `node prisma/seed.js` виконуються автоматично перед стартом `npm run dev`, тож для першого запуску окремі команди зазвичай не потрібні.
 
 ## Prisma
 

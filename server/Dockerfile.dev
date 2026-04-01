@@ -6,7 +6,8 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+RUN chmod +x docker-entrypoint.dev.sh
 
 EXPOSE 4000
 
-CMD ["npm", "run", "dev"]
+CMD ["./docker-entrypoint.dev.sh"]
