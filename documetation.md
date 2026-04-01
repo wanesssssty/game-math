@@ -298,3 +298,18 @@ game-math/
 
 - [Клієнт](./client/README.md)
 - [Сервер і БД](./server/README.md)
+
+---
+
+## Переглянути базу даних
+
+Перейти в папку server
+```bash
+cd server   
+```
+
+Потім ввести команду:
+
+```bash
+npx prisma studio    
+```
