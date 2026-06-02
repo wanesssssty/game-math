@@ -1,16 +1,42 @@
 const { prisma } = require("../db/prisma");
 const { HttpError } = require("../utils/http-error");
 
+const CUSTOMIZATION_TYPES = ["FUR", "EYES", "ACCESSORY", "BACKGROUND"];
+
 /**
- * Оновлення аватара: обраний кіт + екіпіровка по типах (UserCatCustomization).
- * body: { selectedCatId?: uuid, equipped?: [{ customizationId, type }] }
+ * Оновлення аватара:
+ * - legacy: { selectedCatId?, equipped?: [{ customizationId, type }] }
+ * - skin: { skin? } — шлях до PNG (/cats/pipo-nekoninNNN.png), тип FUR
+ * - values: { furColor?, eyeColor?, accessory?, background? } (null = зняти слот)
  */
 async function updateAvatar(req, res) {
-  const { selectedCatId, equipped } = req.body;
+  const { selectedCatId, equipped, skin, furColor, eyeColor, accessory, background } = req.body;
   const userId = req.user.id;
 
-  if (!selectedCatId && !Array.isArray(equipped)) {
-    throw new HttpError(400, "Передай selectedCatId і/або equipped[]");
+  const hasValuePayload =
+    skin !== undefined ||
+    furColor !== undefined ||
+    eyeColor !== undefined ||
+    accessory !== undefined ||
+    background !== undefined;
+
+  let equippedRows = Array.isArray(equipped) ? equipped : null;
+
+  if (hasValuePayload) {
+    equippedRows = await resolveEquippedFromValues({
+      skin,
+      furColor,
+      eyeColor,
+      accessory,
+      background,
+    });
+  }
+
+  if (!selectedCatId && !equippedRows) {
+    throw new HttpError(
+      400,
+      "Передай selectedCatId, equipped[], skin або furColor/eyeColor/accessory/background"
+    );
   }
 
   await prisma.$transaction(async (tx) => {
@@ -33,8 +59,15 @@ async function updateAvatar(req, res) {
       });
     }
 
-    if (Array.isArray(equipped)) {
-      for (const row of equipped) {
+    if (equippedRows) {
+      for (const row of equippedRows) {
+        if (row.remove) {
+          await tx.userCatCustomization.deleteMany({
+            where: { userId, type: row.type },
+          });
+          continue;
+        }
+
         const { customizationId, type } = row;
         if (!customizationId || !type) {
           throw new HttpError(400, "У equipped потрібні customizationId та type");
@@ -91,4 +124,39 @@ async function updateAvatar(req, res) {
   });
 }
 
-module.exports = { updateAvatar };
+async function resolveEquippedFromValues({ skin, furColor, eyeColor, accessory, background }) {
+  const valueSlots = [
+    { type: "FUR", value: skin !== undefined ? skin : furColor },
+    { type: "EYES", value: eyeColor },
+    { type: "ACCESSORY", value: accessory },
+    { type: "BACKGROUND", value: background },
+  ];
+
+  const rows = [];
+
+  for (const slot of valueSlots) {
+    if (slot.value === undefined) continue;
+
+    if (slot.value === null || slot.value === "") {
+      rows.push({ type: slot.type, remove: true });
+      continue;
+    }
+
+    const option = await prisma.customizationOption.findFirst({
+      where: {
+        type: slot.type,
+        imageUrl: String(slot.value),
+      },
+    });
+
+    if (!option) {
+      throw new HttpError(400, `Не знайдено опцію ${slot.type} зі значенням ${slot.value}`);
+    }
+
+    rows.push({ customizationId: option.id, type: slot.type });
+  }
+
+  return rows;
+}
+
+module.exports = { updateAvatar, CUSTOMIZATION_TYPES };

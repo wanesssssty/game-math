@@ -5,9 +5,9 @@ const typeMeta: Record<
   { emoji: string; label: string; description: string }
 > = {
   FUR: {
-    emoji: "🧶",
-    label: "Шерсть",
-    description: "Змінює стиль шерсті твого котика.",
+    emoji: "🐱",
+    label: "Скін",
+    description: "Повний вигляд котика з анімацією при наведенні.",
   },
   EYES: {
     emoji: "✨",

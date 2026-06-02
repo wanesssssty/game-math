@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AuthRequired } from "@/components/auth-required";
+import { CatAvatar } from "@/components/CatAvatar";
 import { SiteFrame } from "@/components/site-frame";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchAccount, type AccountData, type ApiOperationType } from "@/lib/account-api";
+import { DEFAULT_AVATAR_CONFIG, equippedToConfig } from "@/lib/avatar";
 import { ApiError } from "@/lib/api/client";
 import { getLocalProgressSessions } from "@/lib/progress-storage";
 import { getCustomizationUi, getRarityUi } from "@/lib/store-items";
@@ -74,6 +76,11 @@ export default function AccountPage() {
       active = false;
     };
   }, [isAuthenticated, patchUser]);
+
+  const avatarConfig = useMemo(
+    () => (account ? equippedToConfig(account.equipped) : DEFAULT_AVATAR_CONFIG),
+    [account]
+  );
 
   const progressSummary = useMemo(() => {
     const empty = {
@@ -212,10 +219,45 @@ export default function AccountPage() {
               </Card>
             </section>
 
+            <Card className="rounded-2xl border-indigo-300/20 bg-slate-900/90 shadow-xl shadow-black/20">
+              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+                <CardTitle className="text-2xl font-black">Мій котик</CardTitle>
+                <Link
+                  className={cn(
+                    buttonVariants({ size: "sm" }),
+                    "rounded-xl bg-gradient-to-r from-cyan-300 to-pink-300 font-bold text-slate-900"
+                  )}
+                  href="/avatar"
+                >
+                  Налаштувати
+                </Link>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+                <div className="overflow-hidden rounded-2xl border border-slate-700 shadow-lg">
+                  <CatAvatar animateOnHover size={150} skinSrc={avatarConfig.skinSrc} />
+                </div>
+                <div className="flex-1 space-y-3 text-center sm:text-left">
+                  {account.selectedCat ? (
+                    <>
+                      <p className="text-xl font-black text-slate-100">{account.selectedCat.name}</p>
+                      <p className="text-sm text-slate-300">
+                        Рідкість: {getRarityUi(account.selectedCat.rarity).label}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-slate-300">Обери стиль шерсті, очей та аксесуарів.</p>
+                  )}
+                  <p className="text-sm text-slate-400">
+                    Екіпіровано предметів: {account.equipped.length}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             <section className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
               <Card className="rounded-2xl border-indigo-300/20 bg-slate-900/90 shadow-xl shadow-black/20">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-black">Профіль і аватар</CardTitle>
+                  <CardTitle className="text-2xl font-black">Профіль і екіпіровка</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4">
                   <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">

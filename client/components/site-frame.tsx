@@ -14,6 +14,7 @@ import {
   LogOut,
   Menu,
   ShoppingBag,
+  Sparkles,
   UserCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ const navItems = [
   { href: "/division", label: "Ділення", icon: Calculator, group: "Тренування" },
   { href: "/test", label: "Змішаний тест", icon: BookOpen, group: "Тренування" },
   { href: "/shop", label: "Магазин", icon: ShoppingBag, group: "Профіль", requiresAuth: true },
+  { href: "/avatar", label: "Мій котик", icon: Sparkles, group: "Профіль", requiresAuth: true },
   { href: "/inventory", label: "Інвентар", icon: Backpack, group: "Профіль", requiresAuth: true },
   { href: "/account", label: "Акаунт", icon: UserCircle2, group: "Профіль", requiresAuth: true },
 ];

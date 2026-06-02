@@ -105,3 +105,27 @@ export async function fetchInventory() {
 export async function fetchErrorLog(limit = 8) {
   return apiRequest<{ errors: ErrorLogEntry[] }>(`/api/errors?limit=${limit}`);
 }
+
+export type AvatarUpdatePayload = {
+  /** Шлях до spritesheet, напр. /cats/pipo-nekonin001.png */
+  skin?: string;
+  furColor?: string;
+  eyeColor?: string;
+  accessory?: string | null;
+  background?: string | null;
+  selectedCatId?: string;
+  equipped?: { customizationId: string; type: CustomizationType }[];
+};
+
+export type AvatarUpdateResult = {
+  selectedCatId: string | null;
+  selectedCat: CatSummary | null;
+  equipped: EquippedItem[];
+};
+
+export async function updateAvatar(payload: AvatarUpdatePayload) {
+  return apiRequest<AvatarUpdateResult>("/api/avatar/update", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}

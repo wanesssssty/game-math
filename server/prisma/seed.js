@@ -14,22 +14,38 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg(pool),
 });
 
+function skinPrice(index) {
+  if (index === 1) return 0;
+  if (index <= 8) return 50;
+  if (index <= 16) return 100;
+  if (index <= 24) return 150;
+  return 200;
+}
+
+function skinRarity(index) {
+  if (index === 1) return "COMMON";
+  if (index <= 8) return "COMMON";
+  if (index <= 16) return "RARE";
+  if (index <= 24) return "RARE";
+  return "EPIC";
+}
+
 async function main() {
   const cats = [
     {
       name: "Пухнастик",
       rarity: "COMMON",
-      imageUrl: "https://placehold.co/200x200/png?text=Cat+1",
+      imageUrl: "/cats/pipo-nekonin001.png",
     },
     {
       name: "Розумник",
       rarity: "RARE",
-      imageUrl: "https://placehold.co/200x200/png?text=Cat+2",
+      imageUrl: "/cats/pipo-nekonin002.png",
     },
     {
       name: "Зірка",
       rarity: "EPIC",
-      imageUrl: "https://placehold.co/200x200/png?text=Cat+3",
+      imageUrl: "/cats/pipo-nekonin003.png",
     },
   ];
 
@@ -40,40 +56,24 @@ async function main() {
     }
   }
 
-  const options = [
-    {
-      name: "Сіро-блакитна шерсть",
-      type: "FUR",
-      imageUrl: "https://placehold.co/120x120/png?text=Fur",
-      price: 10,
-      rarity: "COMMON",
-    },
-    {
-      name: "Яскраві очі",
-      type: "EYES",
-      imageUrl: "https://placehold.co/120x120/png?text=Eyes",
-      price: 15,
-      rarity: "COMMON",
-    },
-    {
-      name: "Краватка",
-      type: "ACCESSORY",
-      imageUrl: "https://placehold.co/120x120/png?text=Tie",
-      price: 25,
-      rarity: "RARE",
-    },
-    {
-      name: "Космос",
-      type: "BACKGROUND",
-      imageUrl: "https://placehold.co/120x120/png?text=Bg",
-      price: 40,
-      rarity: "EPIC",
-    },
-  ];
-
-  const optCount = await prisma.customizationOption.count();
-  if (optCount === 0) {
-    await prisma.customizationOption.createMany({ data: options });
+  for (let i = 1; i <= 32; i += 1) {
+    const n = String(i).padStart(3, "0");
+    const imageUrl = `/cats/pipo-nekonin${n}.png`;
+    const name = `Неконін #${i}`;
+    const exists = await prisma.customizationOption.findFirst({
+      where: { imageUrl },
+    });
+    if (!exists) {
+      await prisma.customizationOption.create({
+        data: {
+          name,
+          type: "FUR",
+          imageUrl,
+          price: skinPrice(i),
+          rarity: skinRarity(i),
+        },
+      });
+    }
   }
 }
 
