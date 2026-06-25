@@ -5,13 +5,48 @@ const { apiRouter } = require("./routes");
 const { notFoundMiddleware } = require("./middlewares/not-found");
 const { errorHandler } = require("./middlewares/error-handler");
 
+function normalizeOrigin(value) {
+  return value.trim().replace(/\/+$/, "");
+}
+
+function createCorsOrigin() {
+  if (env.nodeEnv === "development") {
+    return true;
+  }
+
+  const allowed = env.corsOrigin
+    .split(",")
+    .map(normalizeOrigin)
+    .filter(Boolean);
+
+  return (origin, callback) => {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    const normalizedOrigin = normalizeOrigin(origin);
+
+    if (allowed.includes(normalizedOrigin)) {
+      callback(null, true);
+      return;
+    }
+
+    // Vercel production + preview URLs
+    if (/^https:\/\/([a-z0-9-]+\.)*vercel\.app$/i.test(normalizedOrigin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`CORS blocked for origin: ${origin}`));
+  };
+}
+
 const app = express();
 
 app.use(
   cors({
-    // У dev дозволяємо будь-який localhost (3000, 3001, …), щоб Next не ламався при зайнятому порту.
-    origin:
-      env.nodeEnv === "development" ? true : env.corsOrigin,
+    origin: createCorsOrigin(),
   })
 );
 app.use(express.json());
