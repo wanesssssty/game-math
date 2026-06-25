@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { GuestPromoBanner } from "@/components/guest-promo-banner";
 import { SiteFrame } from "@/components/site-frame";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -47,7 +48,7 @@ const cards = [
 const benefits = [
   {
     title: "Миттєвий фідбек",
-    text: "Кожна відповідь одразу перевіряється, а користувач бачить результат без затримки.",
+    text: "Кожна відповідь одразу перевіряється — ти одразу бачиш, чи молодець.",
   },
   {
     title: "Навчання через гру",
@@ -105,7 +106,7 @@ export default function Home() {
         if (active) {
           setAccount(null);
           setAccountError(
-            error instanceof ApiError ? error.message : "Не вдалося завантажити персональні дані."
+            error instanceof ApiError ? error.message : "Не вдалося завантажити твій прогрес."
           );
         }
       }
@@ -153,14 +154,14 @@ export default function Home() {
               <Badge variant="secondary">Навчання через гру</Badge>
               <Badge variant="secondary">Для дітей 6+</Badge>
               <Badge variant="secondary">Українською</Badge>
-              {isAuthenticated ? <Badge variant="secondary">Персональний профіль</Badge> : null}
+              {isAuthenticated ? <Badge variant="secondary">Мій профіль</Badge> : null}
             </div>
             <h1 className="max-w-[18ch] text-3xl leading-tight font-black md:text-5xl">
               Math Paws — математика, яку хочеться проходити
             </h1>
             <p className="mt-3 max-w-[58ch] text-indigo-100/90 md:text-lg">
-              Веселий тренажер з додавання, віднімання, множення і ділення. Формат коротких місій,
-              зрозумілий інтерфейс, баланс користувача та мотивація через нагороди.
+              Веселий тренажер з додавання, віднімання, множення і ділення. Короткі місії,
+              цукерки за правильні відповіді та котики в магазині.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <Link
@@ -168,9 +169,9 @@ export default function Home() {
                   buttonVariants(),
                   "h-10 rounded-xl bg-linear-to-r from-cyan-300 via-sky-300 to-pink-300 px-4 font-extrabold text-slate-900 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-400/30"
                 )}
-                href={isAuthenticated ? "/test" : "/login"}
+                href="/test"
               >
-                {isAuthenticated ? "Почати тест" : "Увійти і грати"}
+                Почати тест
               </Link>
               <Link
                 className={cn(
@@ -179,13 +180,13 @@ export default function Home() {
                 )}
                 href={isAuthenticated ? "/account" : "/addition"}
               >
-                {isAuthenticated ? "Перейти в акаунт" : "Обрати тему"}
+                {isAuthenticated ? "Мій профіль" : "Обрати тему"}
               </Link>
             </div>
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-indigo-200/20 bg-slate-950/35 p-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-indigo-100/70">Місії</p>
-                <p className="mt-2 text-lg font-black text-slate-50">10 задач за сесію</p>
+                <p className="mt-2 text-lg font-black text-slate-50">10 задач за місію</p>
               </div>
               <div className="rounded-2xl border border-indigo-200/20 bg-slate-950/35 p-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-indigo-100/70">Нагорода</p>
@@ -205,6 +206,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {!isAuthenticated ? (
+        <section className="mt-6">
+          <GuestPromoBanner />
+        </section>
+      ) : null}
 
       <section className="mt-6 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         <Card className="rounded-2xl border-indigo-300/20 bg-slate-900/90 shadow-xl shadow-black/20">
@@ -276,9 +283,10 @@ export default function Home() {
               найшвидший спосіб побачити сильні й слабкі теми.
             </p>
             <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-              <p className="text-sm font-semibold text-slate-100">Що отримає користувач</p>
+              <p className="text-sm font-semibold text-slate-100">Що ти отримаєш</p>
               <p className="mt-2 text-sm text-slate-300">
-                Підказки, перевірку в реальному часі, поповнення балансу і помилки для повторення.
+                Підказки, миттєву перевірку, цукерки за правильні відповіді й список помилок для
+                повторення.
               </p>
             </div>
             <Link
@@ -286,9 +294,9 @@ export default function Home() {
                 buttonVariants(),
                 "w-fit rounded-xl bg-linear-to-r from-cyan-300 via-sky-300 to-pink-300 px-4 font-extrabold text-slate-900"
               )}
-              href={isAuthenticated ? "/test" : "/login"}
+              href="/test"
             >
-              {isAuthenticated ? "Почати змішаний тест" : "Увійти для тесту"}
+              Почати змішаний тест
             </Link>
           </CardContent>
         </Card>
@@ -304,7 +312,7 @@ export default function Home() {
             <CardTitle className="text-2xl font-black md:text-3xl">
               {isAuthenticated
                 ? `Повертаємось до навчання, ${user?.name || "друже"}`
-                : "Акаунт відкриває повний навчальний цикл"}
+                : "Увійди — і відкриється магазин, інвентар та твій прогрес"}
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4">
@@ -354,18 +362,29 @@ export default function Home() {
             ) : (
               <div className="grid gap-4">
                 <p className="text-indigo-100/85">
-                  Після входу користувач бачить баланс цукерок, акаунт з прогресом, інвентар і
-                  журнал помилок. Це робить головну сторінку не просто красивою, а реально корисною.
+                  Після входу ти побачиш свої цукерки, прогрес у тестах, інвентар і помилки, які
+                  варто повторити. А поки що — просто грай і заробляй нагороди!
                 </p>
-                <Link
-                  className={cn(
-                    buttonVariants(),
-                    "w-fit rounded-xl bg-linear-to-r from-cyan-300 via-sky-300 to-pink-300 px-4 font-extrabold text-slate-900"
-                  )}
-                  href="/login"
-                >
-                  Створити акаунт
-                </Link>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    className={cn(
+                      buttonVariants(),
+                      "w-fit rounded-xl bg-linear-to-r from-cyan-300 via-sky-300 to-pink-300 px-4 font-extrabold text-slate-900"
+                    )}
+                    href="/login"
+                  >
+                    Створити акаунт
+                  </Link>
+                  <Link
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "w-fit rounded-xl border-slate-700 text-slate-100"
+                    )}
+                    href="/test"
+                  >
+                    Почати тест
+                  </Link>
+                </div>
               </div>
             )}
           </CardContent>
@@ -418,7 +437,7 @@ export default function Home() {
               )}
               href={isAuthenticated ? "/shop" : "/login"}
             >
-              {isAuthenticated ? "Перейти в магазин" : "Увійти, щоб відкрити магазин"}
+              {isAuthenticated ? "Перейти в магазин" : "Увійти для магазину"}
             </Link>
           </CardContent>
         </Card>
@@ -486,9 +505,9 @@ export default function Home() {
                   buttonVariants(),
                   "rounded-xl bg-linear-to-r from-cyan-300 via-sky-300 to-pink-300 px-4 font-extrabold text-slate-900"
                 )}
-                href={isAuthenticated ? "/addition" : "/login"}
+                href="/addition"
               >
-                {isAuthenticated ? "Почати тренування" : "Увійти"}
+                Почати тренування
               </Link>
               <Link
                 className={cn(
@@ -497,7 +516,7 @@ export default function Home() {
                 )}
                 href={isAuthenticated ? "/account" : "/test"}
               >
-                {isAuthenticated ? "Відкрити акаунт" : "Подивитись тест"}
+                {isAuthenticated ? "Мій профіль" : "Подивитись тест"}
               </Link>
             </div>
           </CardContent>

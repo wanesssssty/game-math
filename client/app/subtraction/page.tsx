@@ -7,7 +7,7 @@ export default function SubtractionPage() {
       <OperationGame
         operation="subtract"
         title="Гра на віднімання"
-        description="Розв'язуй приклади на віднімання крок за кроком."
+        description="Віднімай числа — заробляй цукерки за правильні відповіді!"
       />
     </SiteFrame>
   );

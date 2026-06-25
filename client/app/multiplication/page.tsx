@@ -7,7 +7,7 @@ export default function MultiplicationPage() {
       <OperationGame
         operation="multiply"
         title="Гра на множення"
-        description="Практика таблиці множення у веселому форматі."
+        description="Вчи таблицю множення — заробляй цукерки за кожну правильну відповідь!"
       />
     </SiteFrame>
   );

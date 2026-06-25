@@ -7,7 +7,7 @@ export default function AdditionPage() {
       <OperationGame
         operation="add"
         title="Гра на додавання"
-        description="Складай числа і отримуй миттєвий фідбек."
+        description="Складай числа — за кожну правильну відповідь отримуєш цукерки!"
       />
     </SiteFrame>
   );

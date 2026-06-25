@@ -1,3 +1,5 @@
+const { prisma } = require("../db/prisma");
+
 function guestEmailFromDisplayName(displayName) {
   const base = String(displayName || "player")
     .trim()
@@ -9,4 +11,21 @@ function guestEmailFromDisplayName(displayName) {
   return `guest.${slug}@mathpaws.local`;
 }
 
-module.exports = { guestEmailFromDisplayName };
+async function findOrCreateGuestUser(displayName) {
+  const name = String(displayName || "guest").trim().slice(0, 64) || "guest";
+  const email = guestEmailFromDisplayName(name);
+
+  return prisma.user.upsert({
+    where: { email },
+    create: {
+      email,
+      name,
+      password: null,
+    },
+    update: {
+      name,
+    },
+  });
+}
+
+module.exports = { guestEmailFromDisplayName, findOrCreateGuestUser };

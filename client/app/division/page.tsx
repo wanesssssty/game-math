@@ -7,7 +7,7 @@ export default function DivisionPage() {
       <OperationGame
         operation="divide"
         title="Гра на ділення"
-        description="Діли числа правильно та перевіряй свої навички."
+        description="Діли числа без залишку — і збирай цукерки за правильні відповіді!"
       />
     </SiteFrame>
   );

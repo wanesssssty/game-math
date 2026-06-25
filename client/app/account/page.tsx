@@ -61,7 +61,7 @@ export default function AccountPage() {
         setError(
           loadError instanceof ApiError
             ? loadError.message
-            : "Не вдалося завантажити дані акаунту."
+            : "Не вдалося завантажити профіль."
         );
       } finally {
         if (active) {
@@ -106,8 +106,13 @@ export default function AccountPage() {
     return (
       <SiteFrame>
         <AuthRequired
-          title="Акаунт"
-          description="Увійди, щоб бачити баланс, прогрес у тестах, інвентар і останні помилки."
+          title="Мій профіль"
+          description="Тут зібрано твої цукерки, прогрес у тестах і останні помилки для повторення."
+          perks={[
+            "Бачиш скільки цукерок заробив",
+            "Дізнаєшся, в якій темі найсильніший",
+            "Повторюєш приклади, де помилився",
+          ]}
         />
       </SiteFrame>
     );
@@ -120,8 +125,8 @@ export default function AccountPage() {
           <CardHeader className="grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-start">
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">Центр акаунту</Badge>
-                <Badge variant="secondary">Реальний API</Badge>
+                <Badge variant="secondary">Центр профілю</Badge>
+                <Badge variant="secondary">Твої нагороди</Badge>
                 <Badge variant="secondary">Прогрес і баланс</Badge>
               </div>
               <CardTitle className="text-3xl font-black md:text-4xl">
@@ -133,7 +138,7 @@ export default function AccountPage() {
               </p>
             </div>
             <div className="grid gap-3 rounded-2xl border border-indigo-300/20 bg-slate-950/60 p-4">
-              <p className="text-sm text-slate-300">Поточний акаунт</p>
+              <p className="text-sm text-slate-300">Твій email</p>
               <p className="text-lg font-bold text-slate-100">{account?.user.email || user?.email}</p>
               <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-amber-100/80">Баланс</p>
@@ -168,7 +173,7 @@ export default function AccountPage() {
 
         {isLoading ? (
           <Card className="rounded-2xl border-indigo-300/20 bg-slate-900/90 shadow-xl shadow-black/20">
-            <CardContent className="py-8 text-sm text-slate-300">Завантажуємо дані акаунту...</CardContent>
+            <CardContent className="py-8 text-sm text-slate-300">Завантажуємо твій профіль...</CardContent>
           </Card>
         ) : null}
 
@@ -210,11 +215,11 @@ export default function AccountPage() {
               </Card>
               <Card className="rounded-2xl border-indigo-300/20 bg-slate-900/90 shadow-xl shadow-black/20">
                 <CardHeader>
-                  <CardTitle className="text-lg font-black">Локальна історія</CardTitle>
+                  <CardTitle className="text-lg font-black">Мої місії</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-3xl font-black text-cyan-100">{localSessionsCount}</p>
-                  <p className="mt-2 text-sm text-slate-300">Збережених браузером гостьових сесій</p>
+                  <p className="mt-2 text-sm text-slate-300">Зіграних місій на цьому пристрої</p>
                 </CardContent>
               </Card>
             </section>

@@ -136,7 +136,14 @@ function AvatarPageContent() {
       <SiteFrame>
         <AuthRequired
           title="Мій котик"
-          description="Увійди в акаунт, щоб обирати скіни для свого котика."
+          description="Тут ти обираєш, як виглядатиме твій котик. Увійди в акаунт, щоб зберегти образ."
+          perks={[
+            "Обери куплений скін",
+            "Змінюй вигляд котика",
+            "Зберігай улюблений образ",
+          ]}
+          playHref="/addition"
+          playLabel="Спочатку пограти"
         />
       </SiteFrame>
     );

@@ -3,10 +3,10 @@ import { ApiTrainingSession } from "@/components/api-training-session";
 export function MixedTest() {
   return (
     <ApiTrainingSession
-      description="Змішана серія на додавання, віднімання, множення і ділення з реальним API-флоу."
+      description="Усі чотири дії в одній веселій місії — заробляй цукерки за правильні відповіді!"
       mode={{ kind: "mixed" }}
       showErrorLog
-      title="Загальний тест"
+      title="Змішаний тест"
     />
   );
 }

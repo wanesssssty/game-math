@@ -56,7 +56,7 @@ export default function LoginPage() {
       setMsg(
         error instanceof ApiError
           ? error.message
-          : "Не вдалося виконати авторизацію. Спробуй ще раз."
+          : "Щось пішло не так. Перевір email і пароль та спробуй ще раз."
       );
     } finally {
       setLoading(false);
@@ -69,7 +69,7 @@ export default function LoginPage() {
         <Card className="max-w-xl rounded-2xl border-indigo-300/20 bg-slate-900/90 shadow-xl shadow-black/20">
           <CardHeader>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary">Уже в акаунті</Badge>
+              <Badge variant="secondary">Ти вже увійшов</Badge>
               <Badge variant="secondary">Баланс: {user?.candyBalance ?? 0}</Badge>
             </div>
             <CardTitle className="text-3xl font-black md:text-4xl">Ти вже увійшов</CardTitle>
@@ -103,9 +103,10 @@ export default function LoginPage() {
       ) : (
       <Card className="max-w-xl rounded-2xl border-indigo-300/20 bg-slate-900/90 shadow-xl shadow-black/20">
         <CardHeader>
-          <CardTitle className="text-3xl font-black md:text-4xl">Авторизація</CardTitle>
+          <CardTitle className="text-3xl font-black md:text-4xl">Вхід у Math Paws</CardTitle>
           <p className="text-indigo-100/85">
-            Увійди в акаунт або створи новий, щоб грати з реальним прогресом, балансом і магазином.
+            Увійди або створи акаунт, щоб зберігати цукерки, купувати котиків і бачити свій
+            прогрес.
           </p>
         </CardHeader>
         <CardContent className="grid gap-4">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AuthRequired } from "@/components/auth-required";
+import { GuestPromoBanner } from "@/components/guest-promo-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,7 +67,7 @@ export function ApiTrainingSession({
   mode,
   showErrorLog = false,
 }: ApiTrainingSessionProps) {
-  const { isAuthenticated, patchUser } = useAuth();
+  const { isAuthenticated, isHydrated, patchUser } = useAuth();
   const [level, setLevel] = useState(1);
   const [question, setQuestion] = useState<ProblemData | null>(null);
   const [currentOperation, setCurrentOperation] = useState<ClientOperation | null>(null);
@@ -114,7 +114,7 @@ export function ApiTrainingSession({
         setPageError(
           error instanceof ApiError
             ? error.message
-            : "Не вдалося завантажити завдання. Спробуй ще раз."
+            : "Ой, приклад не завантажився. Натисни «Почати знову» або онови сторінку."
         );
       } finally {
         setIsLoadingQuestion(false);
@@ -167,23 +167,15 @@ export function ApiTrainingSession({
   }, [awaitingNext, currentOperation, level, loadQuestion, summaryOpen]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setQuestion(null);
-      setPageError("");
-      setHint("");
-      setFeedback(null);
-      setAwaitingNext(false);
-      setAutoNextSecondsLeft(null);
-      setSummaryOpen(false);
+    if (!isHydrated) {
       return;
     }
 
     void startSession(level);
-  }, [isAuthenticated, startSession]); // level reset is controlled manually.
+  }, [isHydrated, startSession]); // level reset is controlled manually.
 
   const answeredAll = attempts >= totalQuestions;
   const canInteract =
-    isAuthenticated &&
     Boolean(question) &&
     !awaitingNext &&
     !summaryOpen &&
@@ -212,7 +204,7 @@ export function ApiTrainingSession({
       if (result.correct) {
         const earned = result.candyEarned ?? 0;
         setSessionCandy((prev) => prev + earned);
-        if (typeof result.candyBalance === "number") {
+        if (isAuthenticated && typeof result.candyBalance === "number") {
           patchUser({ candyBalance: result.candyBalance });
         }
         setFeedback({
@@ -285,17 +277,9 @@ export function ApiTrainingSession({
     await startSession(targetLevel);
   };
 
-  if (!isAuthenticated) {
-    return (
-      <AuthRequired
-        title={title}
-        description="Для реальних задач, підказок, прогресу та цукерок увійди в акаунт."
-      />
-    );
-  }
-
   return (
     <>
+      {!isAuthenticated ? <GuestPromoBanner className="mb-4" /> : null}
       <Card className="rounded-2xl border-indigo-300/20 bg-slate-900/90 shadow-xl shadow-black/20">
         <CardHeader className="grid gap-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -342,7 +326,7 @@ export function ApiTrainingSession({
         </CardHeader>
         <CardContent className="grid gap-5">
           <Progress value={(attempts / totalQuestions) * 100}>
-            <ProgressLabel>Прогрес сесії</ProgressLabel>
+            <ProgressLabel>Твій прогрес</ProgressLabel>
             <ProgressValue>{() => `${attempts}/${totalQuestions}`}</ProgressValue>
           </Progress>
 
@@ -467,7 +451,7 @@ export function ApiTrainingSession({
                 onClick={() => void restartAtLevel(level)}
                 type="button"
               >
-                Почати сесію знову
+                Почати знову
               </button>
             </div>
           </div>
@@ -538,10 +522,10 @@ export function ApiTrainingSession({
           <p>Відповідай по черзі, дивись підказку за потреби й завершуй серію з 10 задач.</p>
           <p>
             {answeredAll
-              ? "Сесію завершено"
+              ? "Молодець, місію завершено!"
               : awaitingNext
                 ? "Наступне завдання відкриється автоматично"
-                : "Після перевірки запуститься перехід до наступного завдання"}
+                : "Після перевірки перейдемо до наступного завдання"}
           </p>
         </CardFooter>
       </Card>
@@ -549,9 +533,9 @@ export function ApiTrainingSession({
       <Dialog open={summaryOpen} onOpenChange={setSummaryOpen}>
         <DialogContent className="bg-slate-900 text-slate-100">
           <DialogHeader>
-            <DialogTitle>Сесію завершено</DialogTitle>
+            <DialogTitle>Місію завершено!</DialogTitle>
             <DialogDescription className="text-slate-300">
-              Ти завершив {totalQuestions} завдань на рівні {level}. Ось короткий підсумок.
+              Ти завершив {totalQuestions} завдань на рівні {level}. Ось твій результат.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3 sm:grid-cols-3">
@@ -574,7 +558,7 @@ export function ApiTrainingSession({
               onClick={() => void restartAtLevel(level)}
               type="button"
             >
-              Нова сесія
+              Нова місія
             </Button>
           </DialogFooter>
         </DialogContent>

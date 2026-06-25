@@ -1,7 +1,7 @@
 const { prisma } = require("../db/prisma");
 const { HttpError } = require("../utils/http-error");
 const { toOperationType } = require("../utils/operation-map");
-const { guestEmailFromDisplayName } = require("../utils/guest-user");
+const { guestEmailFromDisplayName, findOrCreateGuestUser } = require("../utils/guest-user");
 
 function validateProgressPayload(body) {
   const {
@@ -47,22 +47,10 @@ function validateProgressPayload(body) {
 async function createProgressSession(req, res) {
   const payload = validateProgressPayload(req.body);
   const operationType = toOperationType(payload.operation);
-  const email = guestEmailFromDisplayName(payload.childName);
+  const user = await findOrCreateGuestUser(payload.childName);
   const wrongAnswers = payload.answered - payload.correct;
   const level = 1;
   const score = payload.correct;
-
-  const user = await prisma.user.upsert({
-    where: { email },
-    create: {
-      email,
-      name: payload.childName,
-      password: null,
-    },
-    update: {
-      name: payload.childName,
-    },
-  });
 
   const session = await prisma.gameSession.create({
     data: {

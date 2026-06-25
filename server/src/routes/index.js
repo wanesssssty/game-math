@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { healthRouter } = require("./health.route");
 const { progressRouter } = require("./progress.route");
-const { requireAuth } = require("../middlewares/auth");
+const { requireAuth, resolveUser } = require("../middlewares/auth");
 const { register, login } = require("../controllers/auth.controller");
 const { getProblem, postAnswer, getHint } = require("../controllers/problem.controller");
 const { getShop, buy } = require("../controllers/shop.controller");
@@ -21,11 +21,11 @@ apiRouter.get("/shop", getShop);
 
 apiRouter.use("/progress", progressRouter);
 
-apiRouter.use(requireAuth);
+apiRouter.get("/problem", resolveUser, getProblem);
+apiRouter.post("/problem/answer", resolveUser, postAnswer);
+apiRouter.get("/hint", resolveUser, getHint);
 
-apiRouter.get("/problem", getProblem);
-apiRouter.post("/problem/answer", postAnswer);
-apiRouter.get("/hint", getHint);
+apiRouter.use(requireAuth);
 
 apiRouter.get("/account", getAccount);
 apiRouter.post("/shop/buy", buy);

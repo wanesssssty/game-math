@@ -10,6 +10,7 @@ import {
   Calculator,
   Coins,
   Home,
+  Lock,
   LogIn,
   LogOut,
   Menu,
@@ -45,7 +46,7 @@ export function SiteFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { user, isAuthenticated, clearAuth } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const visibleNavItems = navItems.filter((item) => !item.requiresAuth || isAuthenticated);
+  const visibleNavItems = navItems;
   const userName = user?.name || user?.email || null;
   const navGroups = useMemo(() => {
     return visibleNavItems.reduce<Record<string, typeof visibleNavItems>>((groups, item) => {
@@ -94,12 +95,15 @@ export function SiteFrame({ children }: { children: ReactNode }) {
               <SidebarGroup key={groupName} title={groupName}>
                 {items.map((item) => {
                   const Icon = item.icon;
+                  const isLocked = item.requiresAuth && !isAuthenticated;
+                  const href = isLocked ? "/login" : item.href;
 
                   return (
-                    <Link href={item.href} key={item.href} onClick={handleNavigate}>
+                    <Link href={href} key={item.href} onClick={handleNavigate}>
                       <SidebarNavItem active={pathname === item.href}>
                         <Icon className="size-4" />
-                        <span>{item.label}</span>
+                        <span className="flex-1">{item.label}</span>
+                        {isLocked ? <Lock className="size-3.5 text-amber-200/80" /> : null}
                       </SidebarNavItem>
                     </Link>
                   );
@@ -108,11 +112,11 @@ export function SiteFrame({ children }: { children: ReactNode }) {
             ))}
 
             {!isAuthenticated ? (
-              <SidebarGroup title="Доступ">
+              <SidebarGroup title="Вхід">
                 <Link href="/login" onClick={handleNavigate}>
                   <SidebarNavItem active={pathname === "/login"}>
                     <LogIn className="size-4" />
-                    <span>Авторизація</span>
+                    <span>Увійти</span>
                   </SidebarNavItem>
                 </Link>
               </SidebarGroup>
@@ -145,9 +149,19 @@ export function SiteFrame({ children }: { children: ReactNode }) {
                 </Button>
               </div>
             ) : (
-              <p className="px-2 text-sm text-sidebar-foreground/60">
-                Увійди в акаунт, щоб відкрити баланс, магазин, інвентар і персональний профіль.
-              </p>
+              <div className="space-y-3 px-2">
+                <p className="text-sm text-sidebar-foreground/70">
+                  Грай без входу — тести і тренування вже доступні. Увійди, щоб зберегти цукерки,
+                  відкрити магазин і свого котика.
+                </p>
+                <Link
+                  className="inline-flex rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-3 py-2 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/20"
+                  href="/login"
+                  onClick={handleNavigate}
+                >
+                  Створити акаунт
+                </Link>
+              </div>
             )}
           </SidebarFooter>
         </Sidebar>
@@ -177,12 +191,17 @@ export function SiteFrame({ children }: { children: ReactNode }) {
                 {user?.candyBalance ?? 0} цукерок
               </div>
             ) : (
-              <Link
-                className="rounded-full border border-slate-700 px-3 py-2 text-sm font-bold text-slate-200 transition hover:border-cyan-200 hover:bg-cyan-300/10"
-                href="/login"
-              >
-                Увійти
-              </Link>
+              <div className="flex items-center gap-3">
+                <p className="hidden text-sm text-indigo-100/70 sm:block">
+                  Увійди, щоб зберегти цукерки 🍬
+                </p>
+                <Link
+                  className="rounded-full border border-slate-700 px-3 py-2 text-sm font-bold text-slate-200 transition hover:border-cyan-200 hover:bg-cyan-300/10"
+                  href="/login"
+                >
+                  Увійти
+                </Link>
+              </div>
             )}
           </div>
         </header>
@@ -193,7 +212,7 @@ export function SiteFrame({ children }: { children: ReactNode }) {
 
         <footer className="border-t border-sky-200/20 bg-slate-950">
           <div className="mx-auto flex w-[min(1120px,92%)] flex-wrap items-center justify-between gap-4 py-4 text-sm text-indigo-100/80">
-            <p>Math Paws • інтерактивна математика з прогресом, балансом і котячими нагородами.</p>
+            <p>Math Paws • математика, цукерки та котики-нагороди.</p>
             <p>© 2026 • Навчайся через гру</p>
           </div>
         </footer>
